@@ -1,26 +1,69 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-msg-in: var(--msg-in);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* 1. Default Pitch Black */
+:root, .theme-default {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --accent: #2563eb; /* Blue */
+  --accent-hover: #1d4ed8;
+  --msg-in: #121212;
+  color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* 2. Ocean Deep */
+.theme-ocean {
+  --bg-primary: #020617; /* Slate 950 */
+  --bg-secondary: #0f172a; /* Slate 900 */
+  --accent: #06b6d4; /* Cyan 500 */
+  --accent-hover: #0891b2; /* Cyan 600 */
+  --msg-in: #1e293b; /* Slate 800 */
+  color-scheme: dark;
+}
+
+/* 3. Neon Purple */
+.theme-neon {
+  --bg-primary: #170529; /* Deep Purple */
+  --bg-secondary: #2b0b4a; /* Medium Purple */
+  --accent: #d946ef; /* Fuchsia 500 */
+  --accent-hover: #c026d3; /* Fuchsia 600 */
+  --msg-in: #3b0764; /* Purple 900 */
+  color-scheme: dark;
+}
+
+/* 4. Forest Green */
+.theme-forest {
+  --bg-primary: #052e16; /* Emerald 950 */
+  --bg-secondary: #064e3b; /* Emerald 900 */
+  --accent: #10b981; /* Emerald 500 */
+  --accent-hover: #059669; /* Emerald 600 */
+  --msg-in: #065f46; /* Emerald 800 */
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-primary);
+  color: #ffffff;
+}
+
+/* Custom Scrollbar for all themes */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
