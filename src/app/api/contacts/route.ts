@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     const currentUser = await User.findById(myId);
     if (!currentUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    // ২. যাদের সাথে মেসেজ হয়েছে তাদের সবার লেটেস্ট মেসেজ বের করা (Advanced MongoDB Query)
+    // ২. যাদের সাথে মেসেজ হয়েছে তাদের সবার লেটেস্ট মেসেজ বের করা
     const conversations = await Message.aggregate([
       {
         $match: {
@@ -28,7 +28,7 @@ export async function GET(req: Request) {
             { sender: new mongoose.Types.ObjectId(myId) },
             { receiver: new mongoose.Types.ObjectId(myId) }
           ],
-          deletedBy: { $ne: myId } // আমি ডিলিট করেছি এমন মেসেজ বাদ
+          deletedBy: { $ne: myId }
         }
       },
       { $sort: { createdAt: -1 } },
@@ -46,14 +46,15 @@ export async function GET(req: Request) {
       }
     ]);
 
-    // মেসেজ ডাটা ম্যাপে রাখা (সহজে খোঁজার জন্য)
+    // মেসেজ ডাটা ম্যাপে রাখা
     const lastMessageMap = new Map();
-    conversations.forEach(conv => {
+    conversations.forEach((conv: any) => {
       lastMessageMap.set(conv._id.toString(), conv.lastMessage);
     });
 
-    const chattedUserIds = conversations.map(c => c._id.toString());
-    const savedContactIds = currentUser.contacts.map(id => id.toString());
+    // TypeScript Error Fix: (c: any) and (id: any) added
+    const chattedUserIds = conversations.map((c: any) => c._id.toString());
+    const savedContactIds = currentUser.contacts.map((id: any) => id.toString());
     
     // ৩. সেভ করা কন্টাক্ট এবং মেসেজ করা ইউজারদের একসাথে করা (Unique ID List)
     const allRelevantUserIds = Array.from(new Set([...chattedUserIds, ...savedContactIds]));
@@ -62,13 +63,13 @@ export async function GET(req: Request) {
     const users = await User.find({ _id: { $in: allRelevantUserIds } });
 
     // ৫. প্রাইভেসি লজিক এবং ডাটা ফরম্যাট করা
-    const formattedContacts = users.map(user => {
+    const formattedContacts = users.map((user: any) => {
       const uIdStr = user._id.toString();
       
-      const isContact = savedContactIds.includes(uIdStr); // আমি তাকে সেভ করেছি কিনা
-      const hasMeAsContact = user.contacts.map((c: any) => c.toString()).includes(myId); // সে আমাকে সেভ করেছে কিনা
+      const isContact = savedContactIds.includes(uIdStr); 
+      const hasMeAsContact = user.contacts.map((c: any) => c.toString()).includes(myId); 
       
-      // Mutual Privacy Logic (দুইজনেই সেভ করলে তবেই true হবে)
+      // Mutual Privacy Logic 
       const isMutual = isContact && hasMeAsContact;
 
       const nickname = currentUser.nicknames?.get(uIdStr) || "";
@@ -80,9 +81,7 @@ export async function GET(req: Request) {
         name: user.name,
         phone: user.phone,
         avatar: user.avatar,
-        // Mutual হলে আসল Bio, না হলে ডিফল্ট
         bio: isMutual ? user.bio : "Available on Zenex", 
-        // Mutual হলে আসল Note, না হলে ফাঁকা
         note: isMutual ? user.note : "", 
         displayName: nickname || user.name,
         nickname: nickname,
@@ -93,7 +92,7 @@ export async function GET(req: Request) {
     });
 
     // ৬. শর্টিং লজিক (লেটেস্ট মেসেজ উপরে থাকবে)
-    formattedContacts.sort((a, b) => {
+    formattedContacts.sort((a: any, b: any) => {
       const timeA = a.lastMessage?.createdAt ? new Date(a.lastMessage.createdAt).getTime() : 0;
       const timeB = b.lastMessage?.createdAt ? new Date(b.lastMessage.createdAt).getTime() : 0;
       return timeB - timeA;
